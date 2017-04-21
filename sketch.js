@@ -136,7 +136,7 @@ function draw()
         noStroke();
         ellipse(bestAgent.position.x,bestAgent.position.y,bestAgent.size*10);
     }
-    /*
+
     //infos
     pop();
     fill(255);
@@ -149,7 +149,6 @@ function draw()
     text("current average fitness: "+floor(currentAvgFit),250,height-INFOS_HEIGHT/2);
     text("current max fitness: "+floor(currentMaxFit),    450,height-INFOS_HEIGHT/2);
     text("total max fitness: "+floor(totalMaxFit),        650,height-INFOS_HEIGHT/2);
-    */
 
     if(t % delta === 0)
     {
