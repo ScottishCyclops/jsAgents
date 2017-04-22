@@ -9,13 +9,17 @@ class Agent
 
         this.size = radius;
         this.maxVelocity = 5;
-        this.maxAngular = .1;
+        this.maxAngular = .2;
         this.mass = 2;
         this.maxHealth = 100;
         this.health = this.maxHealth;
         this.dna = dna;
         this.fitness = 0;
         this.healthDecreaseRate = .2;
+
+        this.debugMate = false;
+        this.debugGood = false;
+        this.debugBad = false;
     }
 
     getPositionsList(agents)
@@ -47,20 +51,21 @@ class Agent
         return [closestIndex,distance];
     }
 
-    seek(target)
+    seek(target, attraction)
     {
-        let speed = log(p5.Vector.dist(this.position,target));
+        //+1 to prevent log of 0
+        let speed = log(p5.Vector.dist(this.position,target)+1);
 
         let desiredVelocity = p5.Vector.sub(target,this.position).normalize().mult(speed);
 
         let steering = p5.Vector.sub(desiredVelocity,this.velocity);
-        steering = steering.div(this.mass).limit(this.maxAngular);
+        steering = steering.div(this.mass).mult(attraction).limit(this.maxAngular);
         return steering;
     }
 
-    addVelocity(velocity, factor)
+    addSteering(velocity)
     {
-        this.steering.add(velocity.mult(factor)).limit(this.maxVelocity);
+        this.steering.add(velocity).limit(this.maxAngular);
     }
 
     update(good, bad, mates)
@@ -80,7 +85,7 @@ class Agent
         else if(closestGood[1] <= this.dna.goodCareDist);
         {
             //we move towards it at the speed from the dna (can be negative)
-            this.addVelocity(this.seek(good[closestGood[0]]),this.dna.goodAttraction);
+            this.addSteering(this.seek(good[closestGood[0]],this.dna.goodAttraction));
         }
 
         let closestBad = this.getClosest(bad);
@@ -92,17 +97,16 @@ class Agent
             this.healthDecreaseRate+=.1;
             this.size+=2;
             removeIn(bad,closestBad[0]);
-            addIn(bad);
         }
         else if(closestBad[1] <= this.dna.badCareDist)
         {
-            this.addVelocity(this.seek(bad[closestBad[0]]),this.dna.badAttraction);
+            this.addSteering(this.seek(bad[closestBad[0]],this.dna.badAttraction));
         }
 
         let closestMate = this.getClosest(this.getPositionsList(mates));
         if(closestMate[0] != -1 && closestMate[1] <= this.dna.mateCareDist)
         {
-            this.addVelocity(this.seek(mates[closestMate[0]].position),this.mateAttraction);
+            this.addSteering(this.seek(mates[closestMate[0]].position,this.mateAttraction));
         }
 
 
@@ -119,7 +123,7 @@ class Agent
         this.maxVelocity = 10/this.mass;
     }
 
-    draw(debugMate = false, debugGood = false, debugBad = false)
+    draw()
     {
         let aliveColor = color("#e74c3c");
         let deadColor = color(0,0,0);
@@ -129,16 +133,16 @@ class Agent
         noStroke();
         ellipse(this.position.x,this.position.y,this.size);
 
-        if(debugMate)
+        if(this.debugMate)
         {
             push();
             if(this.dna.mateAttraction < 0)
             { 
-                stroke(255,0,0,100);
+                stroke(255,0,0,30);
             }
             else
             {
-                stroke(0,255,0,100);  
+                stroke(0,255,0,30);  
             }
             noFill();
             strokeWeight(abs(this.dna.mateAttraction));
@@ -146,16 +150,16 @@ class Agent
             pop();
         }
 
-        if(debugGood)
+        if(this.debugGood)
         {
             push();
             if(this.dna.goodAttraction < 0)
             { 
-                stroke(255,0,0,100);
+                stroke(255,0,0,30);
             }
             else
             {
-                stroke(0,255,0,100);  
+                stroke(0,255,0,30);  
             }
             noFill();
             strokeWeight(abs(this.dna.goodAttraction));
@@ -163,16 +167,16 @@ class Agent
             pop();
         }
 
-        if(debugBad)
+        if(this.debugBad)
         {
             push();
             if(this.dna.badAttraction < 0)
             { 
-                stroke(255,0,0,100);
+                stroke(255,0,0,30);
             }
             else
             {
-                stroke(0,255,0,100);  
+                stroke(0,255,0,30);  
             }
             noFill();
             strokeWeight(abs(this.dna.badAttraction));

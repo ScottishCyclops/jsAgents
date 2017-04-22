@@ -22,7 +22,11 @@ class Graph
         let amplitude = -30;
 
         stroke(255,255,255, 100);
+        //attraction data 0 line
         line(0,graphMidY,width,graphMidY);
+
+        //population 0 line
+        line(0,height-INFOS_HEIGHT-10,width,height-INFOS_HEIGHT-10);
 
         translate(this.offset,0);
         strokeWeight(3);
@@ -36,6 +40,10 @@ class Graph
             let heightRatio = (this.height/this.maxHeight);
             stroke("#2980b9");
             line(i*this.w, height-(this.data[i][1])*heightRatio, (i+1)*this.w, height-(this.data[i+1][1])*heightRatio);
+
+            //num agents
+            stroke("#ecf0f1");
+            line(i*this.w, height-INFOS_HEIGHT-10-(this.data[i][2]), (i+1)*this.w, height-INFOS_HEIGHT-10-(this.data[i+1][2]));
         
             //bagoodd attraction
             stroke("#f1c40f");
